@@ -1,0 +1,1426 @@
+{
+  "info": {
+    "name": "Wa Go API",
+    "description": "WhatsApp Gateway API ",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "adminKey",
+      "value": "change-me"
+    },
+    {
+      "key": "instanceToken",
+      "value": ""
+    },
+    {
+      "key": "instanceId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Instances (Admin)",
+      "item": [
+        {
+          "name": "Create Instance",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{adminKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Instance\",\n  \"token\": \"my-secret-token\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Instances",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{adminKey}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Instance",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{adminKey}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Delete Instance",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/instances/{{instanceId}}",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{adminKey}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Instance Lifecycle",
+      "item": [
+        {
+          "name": "Connect",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/connect",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Status",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/status",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get QR Code",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/qr-code",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Disconnect",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/disconnect",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/logout",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Pair Phone",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/pair-phone",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"5491155667788\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reconnect",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/reconnect",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Send Text",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"5491155667788\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Hello from WA-Go!\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Send Image",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"5491155667788\",\n  \"type\": \"image\",\n  \"image\": {\n    \"url\": \"https://example.com/photo.jpg\",\n    \"caption\": \"Check this out\",\n    \"mimeType\": \"image/jpeg\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Send Video",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"5491155667788\",\n  \"type\": \"video\",\n  \"video\": {\n    \"url\": \"https://example.com/video.mp4\",\n    \"caption\": \"Watch this\",\n    \"mimeType\": \"video/mp4\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Send Audio (Voice Note)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"5491155667788\",\n  \"type\": \"audio\",\n  \"audio\": {\n    \"url\": \"https://example.com/audio.ogg\",\n    \"mimeType\": \"audio/ogg; codecs=opus\",\n    \"ptt\": true\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Send Document",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"5491155667788\",\n  \"type\": \"document\",\n  \"document\": {\n    \"url\": \"https://example.com/invoice.pdf\",\n    \"fileName\": \"invoice-001.pdf\",\n    \"mimeType\": \"application/pdf\",\n    \"caption\": \"Your invoice\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Send Location",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"5491155667788\",\n  \"type\": \"location\",\n  \"location\": {\n    \"latitude\": -34.6037,\n    \"longitude\": -58.3816,\n    \"name\": \"Obelisco\",\n    \"address\": \"Av. 9 de Julio, Buenos Aires\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Send Contact",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"5491155667788\",\n  \"type\": \"contacts\",\n  \"contacts\": [\n    {\n      \"name\": { \"formatted\": \"Juan Pérez\" },\n      \"phones\": [{ \"phone\": \"+5491122334455\" }]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Send Poll",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"5491155667788\",\n  \"type\": \"poll\",\n  \"poll\": {\n    \"name\": \"Preferred time?\",\n    \"options\": [\"Morning\", \"Afternoon\", \"Evening\"],\n    \"selectableCount\": 1\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "React to Message",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages/MSG_ID/react",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emoji\": \"👍\",\n  \"fromMe\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Revoke Message",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages/MSG_ID/revoke",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chatJid\": \"5491155667788@s.whatsapp.net\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Edit Message",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages/MSG_ID/edit",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chatJid\": \"5491155667788@s.whatsapp.net\",\n  \"text\": \"Updated message text\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages/MSG_ID/read",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chatJid\": \"5491155667788@s.whatsapp.net\",\n  \"senderJid\": \"5491155667788@s.whatsapp.net\",\n  \"messageIds\": [\"MSG_ID_1\", \"MSG_ID_2\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Download Media",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/messages/MSG_ID/download",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chats",
+      "item": [
+        {
+          "name": "Pin Chat",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/chats/5491155667788@s.whatsapp.net/pin",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Unpin Chat",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/chats/5491155667788@s.whatsapp.net/unpin",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Archive Chat",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/chats/5491155667788@s.whatsapp.net/archive",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Unarchive Chat",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/chats/5491155667788@s.whatsapp.net/unarchive",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Mute Chat",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/chats/5491155667788@s.whatsapp.net/mute",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Unmute Chat",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/chats/5491155667788@s.whatsapp.net/unmute",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Send Typing/Recording",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/chats/5491155667788@s.whatsapp.net/presence",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chatJid\": \"5491155667788@s.whatsapp.net\",\n  \"state\": \"composing\",\n  \"media\": \"\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Groups",
+      "item": [
+        {
+          "name": "List Groups",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Create Group",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"My Group\",\n  \"participants\": [\"5491155667788\", \"5491122334455\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Group Info",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Join Group",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/GROUP_JID/join",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inviteCode\": \"AbCdEfGhIjK\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Leave Group",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/leave",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Invite Link",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/invite-link",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Reset Invite Link",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/invite-link/reset",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Add Participants",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/participants/add",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participants\": [\"5491155667788\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Remove Participants",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/participants/remove",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participants\": [\"5491155667788\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Promote to Admin",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/participants/promote",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participants\": [\"5491155667788\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Demote from Admin",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/participants/demote",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participants\": [\"5491155667788\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Settings",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/settings",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Group Name\",\n  \"description\": \"Updated description\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Set Group Photo",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/photo",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Join Requests",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/join-requests",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Handle Join Request",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/groups/120363001234567890@g.us/join-requests/handle",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"approve\",\n  \"participant\": \"5491155667788@s.whatsapp.net\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "item": [
+        {
+          "name": "Check Numbers (Batch)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/contacts/check",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phones\": [\"+5491155667788\", \"+5491122334455\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Contact Info",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/contacts/5491155667788@s.whatsapp.net",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Profile Picture",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/contacts/5491155667788@s.whatsapp.net/profile-picture",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Business Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/contacts/5491155667788@s.whatsapp.net/business-profile",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Block Contact",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/contacts/5491155667788@s.whatsapp.net/block",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Unblock Contact",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/contacts/5491155667788@s.whatsapp.net/unblock",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Blocklist",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/contacts/blocklist",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Newsletters",
+      "item": [
+        {
+          "name": "List Subscribed",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/newsletters",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Newsletter Info",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/newsletters/NEWSLETTER_JID",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Follow",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/newsletters/NEWSLETTER_JID/follow",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Unfollow",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/newsletters/NEWSLETTER_JID/unfollow",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Mute",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/newsletters/NEWSLETTER_JID/mute",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Unmute",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/newsletters/NEWSLETTER_JID/unmute",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Presence",
+      "item": [
+        {
+          "name": "Set Online/Offline",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/presence",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"presence\": \"available\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Subscribe to Contact Presence",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/presence/5491155667788@s.whatsapp.net/subscribe",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Privacy",
+      "item": [
+        {
+          "name": "Get Privacy Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/privacy",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Privacy Setting",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/privacy",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"setting\": \"last_seen\",\n  \"value\": \"nobody\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Set Status Message",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/profile/status-message",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Available for business\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get QR Link",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/profile/qr-link",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Revoke QR Link",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/profile/qr-link/revoke",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Set Avatar",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/profile/avatar",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Set Push Name",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/profile/pushname",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Name\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Create Webhook",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/webhooks",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://myapp.com/webhooks/wa\",\n  \"secret\": \"whsec_mysecret123\",\n  \"events\": [\"message.received\", \"message.read\", \"instance.disconnected\", \"call.offer\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "List Webhooks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/webhooks",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Webhook",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/webhooks/WEBHOOK_ID",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Delete Webhook",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/webhooks/WEBHOOK_ID",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Test Webhook",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/webhooks/WEBHOOK_ID/test",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Calls",
+      "item": [
+        {
+          "name": "Reject Call",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/calls/CALL_ID/reject",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"callCreator\": \"5491155667788@s.whatsapp.net\",\n  \"callId\": \"CALL_ID\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Labels",
+      "item": [
+        {
+          "name": "List Labels",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/labels",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Create Label",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/labels",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"VIP\",\n  \"color\": 0\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Label",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/labels/LABEL_ID",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Label Chat",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instances/{{instanceId}}/labels/LABEL_ID/chat",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{instanceToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chatJid\": \"5491155667788@s.whatsapp.net\",\n  \"action\": \"add\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
