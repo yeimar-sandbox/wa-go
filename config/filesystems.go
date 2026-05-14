@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/goravel/framework/support/path"
 
-	"githubb.com/yeimar-projects/wa-go/app/facades"
+	"github.com/yeimar-projects/wa-go/app/facades"
 )
 
 func init() {

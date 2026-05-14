@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"githubb.com/yeimar-projects/wa-go/app/models"
+	"github.com/yeimar-projects/wa-go/app/models"
 )
 
 func TestInstanceStatus_Constants(t *testing.T) {

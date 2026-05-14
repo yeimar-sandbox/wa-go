@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"githubb.com/yeimar-projects/wa-go/tests"
+	"github.com/yeimar-projects/wa-go/tests"
 )
 
 type HealthTestSuite struct {

@@ -7,7 +7,7 @@ import (
 	"github.com/goravel/framework/contracts/database/driver"
 	postgresfacades "github.com/goravel/postgres/facades"
 	sqlitefacades "github.com/goravel/sqlite/facades"
-	"githubb.com/yeimar-projects/wa-go/app/facades"
+	"github.com/yeimar-projects/wa-go/app/facades"
 )
 
 func init() {

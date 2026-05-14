@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/gin"
 	ginfacades "github.com/goravel/gin/facades"
-	"githubb.com/yeimar-projects/wa-go/app/facades"
+	"github.com/yeimar-projects/wa-go/app/facades"
 )
 
 func init() {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"githubb.com/yeimar-projects/wa-go/app/services"
+	"github.com/yeimar-projects/wa-go/app/services"
 )
 
 func TestSendMessageRequest_TextValidation(t *testing.T) {

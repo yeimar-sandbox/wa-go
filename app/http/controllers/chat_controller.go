@@ -6,9 +6,9 @@ import (
 	contractshttp "github.com/goravel/framework/contracts/http"
 	"go.mau.fi/whatsmeow/types"
 
-	"githubb.com/yeimar-projects/wa-go/app/http/middleware"
-	"githubb.com/yeimar-projects/wa-go/app/http/response"
-	"githubb.com/yeimar-projects/wa-go/app/services"
+	"github.com/yeimar-projects/wa-go/app/http/middleware"
+	"github.com/yeimar-projects/wa-go/app/http/response"
+	"github.com/yeimar-projects/wa-go/app/services"
 )
 
 type ChatController struct{ svc *services.ChatService }

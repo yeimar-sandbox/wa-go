@@ -5,7 +5,7 @@ import (
 
 	contractshttp "github.com/goravel/framework/contracts/http"
 
-	apperrors "githubb.com/yeimar-projects/wa-go/app/errors"
+	apperrors "github.com/yeimar-projects/wa-go/app/errors"
 )
 
 // ---------------------------------------------------------------------------

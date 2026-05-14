@@ -1,7 +1,7 @@
 package config
 
 import (
-	"githubb.com/yeimar-projects/wa-go/app/facades"
+	"github.com/yeimar-projects/wa-go/app/facades"
 )
 
 func init() {

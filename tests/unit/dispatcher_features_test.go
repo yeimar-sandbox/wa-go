@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"githubb.com/yeimar-projects/wa-go/app/whatsapp"
+	"github.com/yeimar-projects/wa-go/app/whatsapp"
 )
 
 func TestDispatcher_MessageReceivedEvent_ContainsCorrectPayload(t *testing.T) {

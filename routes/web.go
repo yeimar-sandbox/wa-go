@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support"
 
-	"githubb.com/yeimar-projects/wa-go/app/facades"
+	"github.com/yeimar-projects/wa-go/app/facades"
 )
 
 func Web() {

@@ -6,8 +6,8 @@ import (
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/types"
 
-	apperrors "githubb.com/yeimar-projects/wa-go/app/errors"
-	"githubb.com/yeimar-projects/wa-go/app/whatsapp"
+	apperrors "github.com/yeimar-projects/wa-go/app/errors"
+	"github.com/yeimar-projects/wa-go/app/whatsapp"
 )
 
 type GroupService struct{ mgr *whatsapp.Manager }

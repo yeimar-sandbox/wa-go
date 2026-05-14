@@ -6,7 +6,7 @@ import (
 
 	"go.mau.fi/whatsmeow"
 
-	apperrors "githubb.com/yeimar-projects/wa-go/app/errors"
+	apperrors "github.com/yeimar-projects/wa-go/app/errors"
 )
 
 type SendFunc[T any] func(client *whatsmeow.Client) (T, error)

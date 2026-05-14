@@ -4,11 +4,11 @@ import (
 	contractshttp "github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/route"
 
-	"githubb.com/yeimar-projects/wa-go/app/facades"
-	"githubb.com/yeimar-projects/wa-go/app/http/controllers"
-	"githubb.com/yeimar-projects/wa-go/app/http/middleware"
-	"githubb.com/yeimar-projects/wa-go/app/services"
-	"githubb.com/yeimar-projects/wa-go/app/whatsapp"
+	"github.com/yeimar-projects/wa-go/app/facades"
+	"github.com/yeimar-projects/wa-go/app/http/controllers"
+	"github.com/yeimar-projects/wa-go/app/http/middleware"
+	"github.com/yeimar-projects/wa-go/app/services"
+	"github.com/yeimar-projects/wa-go/app/whatsapp"
 )
 
 func Api() {

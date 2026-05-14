@@ -1,7 +1,7 @@
 package main
 
 import (
-	"githubb.com/yeimar-projects/wa-go/bootstrap"
+	"github.com/yeimar-projects/wa-go/bootstrap"
 )
 
 func main() {

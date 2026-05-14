@@ -4,8 +4,8 @@ import (
 	contractsfoundation "github.com/goravel/framework/contracts/foundation"
 	"github.com/goravel/framework/foundation"
 
-	"githubb.com/yeimar-projects/wa-go/config"
-	"githubb.com/yeimar-projects/wa-go/routes"
+	"github.com/yeimar-projects/wa-go/config"
+	"github.com/yeimar-projects/wa-go/routes"
 )
 
 func Boot() contractsfoundation.Application {
