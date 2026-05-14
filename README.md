@@ -1,99 +1,400 @@
 <div align="center">
 
-<img src="https://www.goravel.dev/logo.png?v=1.14.x" width="300" alt="Logo">
+<img src=".github/dark-banner.png" alt="WA-Go" width="100%">
 
-[![Doc](https://pkg.go.dev/badge/github.com/goravel/framework)](https://pkg.go.dev/github.com/goravel/framework)
-[![Go](https://img.shields.io/github/go-mod/go-version/goravel/framework)](https://go.dev/)
-[![Release](https://img.shields.io/github/release/goravel/framework.svg)](https://github.com/goravel/framework/releases)
-[![Test](https://github.com/goravel/framework/actions/workflows/test.yml/badge.svg)](https://github.com/goravel/framework/actions)
-[![Report Card](https://goreportcard.com/badge/github.com/goravel/framework)](https://goreportcard.com/report/github.com/goravel/framework)
-[![Codecov](https://codecov.io/gh/goravel/framework/branch/master/graph/badge.svg)](https://codecov.io/gh/goravel/framework)
-![License](https://img.shields.io/github/license/goravel/framework)
+<br/>
+<br/>
+
+**Multi-instance WhatsApp API Gateway**
+
+A production-ready REST API for WhatsApp built with [Goravel](https://www.goravel.dev) and [whatsmeow](https://github.com/tulir/whatsmeow).  
+Manage multiple WhatsApp sessions through HTTP endpoints with real-time event streaming.
+
+[![Go](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Framework](https://img.shields.io/badge/Framework-Goravel-purple)](https://www.goravel.dev)
 
 </div>
 
-English | [中文](./README_zh.md)
+---
 
-## About Goravel
+## Features
 
-Goravel is a full-featured, scalable web application framework that provides a starting scaffold to help Gophers quickly build their applications.
+| Category | Capabilities |
+|----------|-------------|
+| **Messaging** | Text, images, documents, audio, video, stickers, contacts, location, buttons, reactions, edits, revoke |
+| **Groups** | Create, manage participants, settings, invite links, join requests |
+| **Contacts** | Check existence, profile info, profile picture, block/unblock |
+| **Chats** | Pin, archive, mute, mark as read |
+| **Presence** | Online status subscription, typing indicators |
+| **Newsletters** | List, follow/unfollow, mute channels |
+| **Calls** | Reject incoming calls |
+| **Privacy** | Get and update privacy settings |
+| **Profile** | Update display name, avatar, status |
+| **Labels** | Create labels, assign to chats |
+| **Events** | Webhooks (HMAC-SHA256 signed) + WebSocket real-time stream |
+| **Reliability** | Idempotency keys to prevent duplicate sends |
+| **Auth** | QR Code and Phone Pairing support |
 
-The framework style is consistent with [Laravel](https://laravel.com/), so PHP developers don’t need to learn a new framework and can still enjoy playing around with Golang, in tribute to Laravel!
+---
 
-We welcome stars, PRs, and issues!
+## Architecture
 
-## Documentation
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Client Apps                              │
+│              (Web, Mobile, Bots, Integrations)                   │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │ HTTP / WebSocket
+                               ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        WA-Go API Server                          │
+│                         (Goravel + Gin)                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────────────┐ │
+│  │  Middleware   │  │  Controllers │  │   WebSocket Handler   │ │
+│  │ • Admin Auth  │  │ • Instance   │  │   (real-time events)  │ │
+│  │ • Token Auth  │  │ • Message    │  └───────────┬───────────┘ │
+│  │ • Idempotency │  │ • Group      │              │             │
+│  └──────┬───────┘  │ • Contact    │              │             │
+│         │           │ • Chat       │              │             │
+│         │           │ • Presence   │              │             │
+│         │           │ • Privacy    │              │             │
+│         │           │ • Profile    │              │             │
+│         │           │ • Newsletter │              │             │
+│         │           │ • Call       │              │             │
+│         │           │ • Label      │              │             │
+│         │           │ • Webhook    │              │             │
+│         │           └──────┬───────┘              │             │
+│         │                  │                      │             │
+│         ▼                  ▼                      ▼             │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                    Service Layer                          │   │
+│  │  MessageService · GroupService · ContactService · etc.   │   │
+│  └────────────────────────────┬────────────────────────────┘   │
+│                               │                                  │
+│                               ▼                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                  WhatsApp Manager                         │   │
+│  │  • Multi-client connection pool                          │   │
+│  │  • Session lifecycle (connect/disconnect/logout)         │   │
+│  │  • QR code generation & phone pairing                    │   │
+│  └────────────────────────────┬────────────────────────────┘   │
+│                               │                                  │
+│                               ▼                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                 Event Dispatcher                          │   │
+│  │  • Webhook delivery (HMAC-SHA256 signed)                 │   │
+│  │  • WebSocket broadcast                                   │   │
+│  │  • Event filtering (wildcards: "message.*")              │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+     ┌──────────────┐ ┌────────┐ ┌──────────────┐
+     │  PostgreSQL   │ │  WA    │ │   Webhook    │
+     │  (sessions,   │ │ Servers│ │  Endpoints   │
+     │   webhooks,   │ └────────┘ │  (your apps) │
+     │   messages)   │            └──────────────┘
+     └──────────────┘
+```
 
-Online documentation [https://www.goravel.dev](https://www.goravel.dev)
+---
 
-Example [https://github.com/goravel/example](https://github.com/goravel/example)
+## Quick Start
 
-> To optimize the documentation, please submit a PR to the documentation
-> repository [https://github.com/goravel/docs](https://github.com/goravel/docs)
+### Prerequisites
 
-## Main Features
+- Go 1.25+
+- PostgreSQL (or SQLite for local development)
 
-| Module Name | Description |
-|-------------|-------------|
-| [Artisan Console](https://www.goravel.dev/digging-deeper/artisan-console.html) | CLI command-line interface for application management and automation |
-| [Authentication](https://www.goravel.dev/security/authentication.html) | User identity verification with JWT and Session drivers |
-| [Authorization](https://www.goravel.dev/security/authorization.html) | Permission-based access control using policies and gates |
-| [Cache](https://www.goravel.dev/digging-deeper/cache.html) | Store and retrieve data using memory, Redis, or custom drivers |
-| [Carbon](https://www.goravel.dev/digging-deeper/helpers.html) | Helper functions for date and time manipulation |
-| [Config](https://www.goravel.dev/getting-started/configuration.html) | Application configuration management from files and environment |
-| [Crypt](https://www.goravel.dev/security/encryption.html) | Secure data encryption and decryption utilities |
-| [DB](https://www.goravel.dev/database/getting-started.html) | Database query builder |
-| [Event](https://www.goravel.dev/digging-deeper/event.html) | Application event dispatching and listening system |
-| [Factory](https://www.goravel.dev/orm/factories.html) | Generate fake model data for testing purposes |
-| [FileStorage](https://www.goravel.dev/digging-deeper/filesystem.html) | File upload, download, and storage across multiple drivers |
-| [Grpc](https://www.goravel.dev/the-basics/grpc.html) | High-performance gRPC server and client implementation |
-| [Hash](https://www.goravel.dev/security/hashing.html) | Secure password hashing |
-| [Http](https://www.goravel.dev/the-basics/routing.html) | HTTP routing, controllers, and middleware management |
-| [Http Client](https://www.goravel.dev/digging-deeper/http-client.html) | Make HTTP requests to external APIs and services |
-| [Localization](https://www.goravel.dev/digging-deeper/localization.html) | Multi-language translation and locale management |
-| [Logger](https://www.goravel.dev/the-basics/logging.html) | Application logging to files, console, or external services |
-| [Mail](https://www.goravel.dev/digging-deeper/mail.html) | Send emails via SMTP or queue-based delivery |
-| [Mock](https://www.goravel.dev/testing/mock.html) | Create test mocks for facades and dependencies |
-| [Migrate](https://www.goravel.dev/database/migrations.html) | Version control for database schema changes |
-| [Orm](https://www.goravel.dev/orm/getting-started.html) | Elegant Orm implementation for database operations |
-| [Package Development](https://www.goravel.dev/digging-deeper/package-development.html) | Build reusable packages to extend framework functionality |
-| [Process](https://www.goravel.dev/digging-deeper/process.html) | An expressive and elegant API around Go's standard os/exec package |
-| [Queue](https://www.goravel.dev/digging-deeper/queues.html) | Defer time-consuming tasks to background job processing |
-| [Seeder](https://www.goravel.dev/database/seeding.html) | Populate database tables with test or initial data |
-| [Session](https://www.goravel.dev/the-basics/session.html) | Manage user session data across HTTP requests |
-| [Task Scheduling](https://www.goravel.dev/digging-deeper/task-scheduling.html) | Schedule recurring tasks using cron-like expressions |
-| [Testing](https://www.goravel.dev/testing/getting-started.html) | HTTP testing, mocking, and assertion utilities |
-| [Validation](https://www.goravel.dev/the-basics/validation.html) | Validate incoming request data using rules |
-| [View](https://www.goravel.dev/the-basics/views.html) | Template rendering engine for HTML responses |
+### 1. Clone & Install
 
-## Compare With Laravel
+```bash
+git clone https://github.com/yeimar-projects/wa-go.git
+cd wa-go
+go mod tidy
+```
 
-[For Detail](https://www.goravel.dev/prologue/compare-with-laravel.html)
+### 2. Configure Environment
 
-## Roadmap
+```bash
+cp .env.example .env
+```
 
-[For Detail](https://github.com/goravel/goravel/issues?q=is%3Aissue+is%3Aopen)
+Edit `.env`:
 
-## Excellent Extend Packages
+```env
+APP_PORT=3000
 
-[For Detail](https://www.goravel.dev/getting-started/packages.html)
+# Database
+DB_CONNECTION=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_DATABASE=wa_go
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
 
-## Contributors
+# WhatsApp
+WA_GLOBAL_API_KEY=your-secret-admin-key
+WA_CONNECT_ON_STARTUP=true
+WA_CHECK_USER_EXISTS=true
+WA_SAVE_MESSAGES=false
+WA_DEBUG=INFO
+```
 
-This project exists thanks to all the people who contribute, to participate in the contribution, please see [Contribution Guide](https://www.goravel.dev/prologue/contributions.html).
+### 3. Run
 
-## Sponsor
+```bash
+go run .
+```
 
-Better development of the project is inseparable from your support, reward us by [Open Collective](https://opencollective.com/goravel).
+Server starts at `http://localhost:3000`.
 
-<p align="left"><img src="https://www.goravel.dev/reward.png" width="200"></p>
+### 4. Create Your First Instance
 
-## Group
+```bash
+curl -X POST http://localhost:3000/api/v1/instances \
+  -H "apikey: your-secret-admin-key" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-whatsapp"}'
+```
 
-Welcome more discussion in Discord.
+The response includes the instance token for subsequent authenticated requests.
 
-[https://discord.gg/cFc5csczzS](https://discord.gg/cFc5csczzS)
+### 5. Connect via QR Code
+
+```bash
+curl http://localhost:3000/api/v1/instances/{id}/qr-code \
+  -H "apikey: {instance-token}"
+```
+
+Scan the QR code with WhatsApp on your phone — you're connected.
+
+---
+
+## Docker
+
+```bash
+# Standalone
+docker build -t wa-go .
+docker run -p 3000:3000 --env-file .env wa-go
+
+# With docker-compose
+docker-compose up -d
+```
+
+---
+
+## Authentication
+
+Two levels of authentication via the `apikey` header:
+
+| Scope | Value |
+|-------|-------|
+| Admin routes (`POST/GET/DELETE /api/v1/instances`) | `WA_GLOBAL_API_KEY` from `.env` |
+| Instance routes (`/api/v1/instances/{id}/*`) | Instance token (returned on creation) |
+
+Instance auth also accepts `?apikey=` as a query parameter, useful for WebSocket connections.
+
+---
+
+## API Endpoints
+
+All instance routes are prefixed with `/api/v1`.
+
+### Instances (Admin)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/health` | Health check |
+| POST | `/api/v1/instances` | Create instance |
+| GET | `/api/v1/instances` | List all instances |
+| GET | `/api/v1/instances/{id}` | Get instance details |
+| DELETE | `/api/v1/instances/{id}` | Delete instance |
+
+### Instance Lifecycle
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/{id}/connect` | Connect to WhatsApp |
+| POST | `/{id}/disconnect` | Disconnect |
+| POST | `/{id}/logout` | Logout (clears session) |
+| GET | `/{id}/status` | Connection status |
+| GET | `/{id}/qr-code` | Get QR code for pairing |
+| POST | `/{id}/pair-phone` | Pair via phone number |
+
+### Messages
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/{id}/messages` | Send message (text, media, location, contact, buttons) |
+| POST | `/{id}/messages/{msgId}/react` | React to message |
+| POST | `/{id}/messages/{msgId}/revoke` | Revoke message |
+| POST | `/{id}/messages/{msgId}/edit` | Edit message |
+| POST | `/{id}/messages/{msgId}/read` | Mark as read |
+| GET | `/{id}/messages/{msgId}/download` | Download media |
+
+### Groups
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/{id}/groups` | List groups |
+| POST | `/{id}/groups` | Create group |
+| GET | `/{id}/groups/{gid}` | Group info |
+| PATCH | `/{id}/groups/{gid}/settings` | Update settings |
+| POST | `/{id}/groups/{gid}/participants/add` | Add members |
+| POST | `/{id}/groups/{gid}/participants/remove` | Remove members |
+| POST | `/{id}/groups/{gid}/participants/promote` | Promote to admin |
+| POST | `/{id}/groups/{gid}/participants/demote` | Demote admin |
+| GET | `/{id}/groups/{gid}/invite-link` | Get invite link |
+| POST | `/{id}/groups/{gid}/join` | Join via invite link |
+| POST | `/{id}/groups/{gid}/leave` | Leave group |
+
+### Contacts
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/{id}/contacts/check` | Check if numbers exist on WhatsApp |
+| GET | `/{id}/contacts/{jid}` | Get contact info |
+| GET | `/{id}/contacts/{jid}/profile-picture` | Get profile picture |
+| POST | `/{id}/contacts/{jid}/block` | Block contact |
+| POST | `/{id}/contacts/{jid}/unblock` | Unblock contact |
+
+### Chats
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/{id}/chats/{chatId}/pin` | Pin chat |
+| POST | `/{id}/chats/{chatId}/archive` | Archive chat |
+| POST | `/{id}/chats/{chatId}/mute` | Mute chat |
+
+### Presence, Privacy & Profile
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `/{id}/presence` | Set presence (available/unavailable) |
+| POST | `/{id}/presence/{jid}/subscribe` | Subscribe to contact presence |
+| GET | `/{id}/privacy` | Get privacy settings |
+| PATCH | `/{id}/privacy` | Update privacy settings |
+| PUT | `/{id}/profile/status-message` | Set status message |
+| POST | `/{id}/profile/avatar` | Set profile picture |
+| POST | `/{id}/profile/pushname` | Set display name |
+
+### Newsletters
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/{id}/newsletters` | List subscribed newsletters |
+| POST | `/{id}/newsletters/{nid}/follow` | Follow newsletter |
+| POST | `/{id}/newsletters/{nid}/unfollow` | Unfollow newsletter |
+| POST | `/{id}/newsletters/{nid}/mute` | Mute newsletter |
+
+### Labels
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/{id}/labels` | List labels |
+| POST | `/{id}/labels` | Create label |
+| DELETE | `/{id}/labels/{labelId}` | Delete label |
+| POST | `/{id}/labels/{labelId}/chat` | Assign label to chat |
+
+### Webhooks & WebSocket
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/{id}/webhooks` | Register webhook |
+| GET | `/{id}/webhooks` | List webhooks |
+| DELETE | `/{id}/webhooks/{wid}` | Delete webhook |
+| POST | `/{id}/webhooks/{wid}/test` | Test webhook delivery |
+| GET | `/{id}/ws` | WebSocket connection |
+
+> Full API documentation available as a Postman collection: [`docs/wa-go-api.postman_collection.json`](docs/wa-go-api.postman_collection.json)
+
+---
+
+## Event System
+
+### Webhooks
+
+Register a webhook to receive HTTP POST callbacks when events occur:
+
+```bash
+curl -X POST http://localhost:3000/api/v1/instances/{id}/webhooks \
+  -H "apikey: {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://your-app.com/webhook",
+    "events": ["message.*", "connection.*"],
+    "secret": "your-webhook-secret"
+  }'
+```
+
+- Payloads are signed with HMAC-SHA256 via the `X-Webhook-Signature` header
+- Use wildcard patterns like `message.*` to subscribe to event groups
+- An empty `events` array subscribes to all events
+
+### WebSocket
+
+Connect for real-time event streaming:
+
+```
+ws://localhost:3000/api/v1/instances/{id}/ws?apikey={token}
+```
+
+Event payload:
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "type": "message.received",
+  "instanceId": "instance-id",
+  "timestamp": "2026-05-14T07:30:00Z",
+  "data": { ... }
+}
+```
+
+---
+
+## Configuration Reference
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `APP_PORT` | Server port | `3000` |
+| `DB_CONNECTION` | Database driver (`postgres`, `sqlite`) | — |
+| `DB_HOST` | Database host | — |
+| `DB_PORT` | Database port | — |
+| `DB_DATABASE` | Database name | — |
+| `DB_USERNAME` | Database user | — |
+| `DB_PASSWORD` | Database password | — |
+| `WA_GLOBAL_API_KEY` | Admin API key for instance management | — |
+| `WA_CONNECT_ON_STARTUP` | Auto-connect all instances on boot | `true` |
+| `WA_CHECK_USER_EXISTS` | Verify recipient exists before sending | `true` |
+| `WA_SAVE_MESSAGES` | Persist sent/received messages to DB | `false` |
+| `WA_DEBUG` | whatsmeow log level (`INFO`, `DEBUG`, `WARN`) | `INFO` |
+| `WA_CLIENT_NAME` | Client display name in WhatsApp | `wa-go` |
+| `WA_QRCODE_MAX_COUNT` | Max QR code generation attempts per session | `5` |
+
+---
+
+## Testing
+
+```bash
+# All tests
+go test ./tests/... -v
+
+# Unit tests only
+go test ./tests/unit/... -v
+
+# Integration tests
+go test ./tests/feature/... -v
+```
+
+---
 
 ## License
 
-The Goravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+[MIT](LICENSE)
