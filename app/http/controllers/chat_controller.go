@@ -1,0 +1,98 @@
+package controllers
+
+import (
+	"time"
+
+	contractshttp "github.com/goravel/framework/contracts/http"
+	"go.mau.fi/whatsmeow/types"
+
+	"githubb.com/yeimar-projects/wa-go/app/http/middleware"
+	"githubb.com/yeimar-projects/wa-go/app/http/response"
+	"githubb.com/yeimar-projects/wa-go/app/services"
+)
+
+type ChatController struct{ svc *services.ChatService }
+
+func NewChatController(svc *services.ChatService) *ChatController {
+	return &ChatController{svc: svc}
+}
+
+func (c *ChatController) Pin(ctx contractshttp.Context) contractshttp.Response {
+	inst := middleware.GetInstance(ctx)
+	chatJID, err := requireJID(ctx, "chatId")
+	if err != nil {
+		return response.Error(ctx, err)
+	}
+	if err := c.svc.Pin(inst.ID, chatJID, true); err != nil {
+		return response.Error(ctx, err)
+	}
+	return ctx.Response().Success().Json(response.NewSuccess(nil, "Chat pinned successfully"))
+}
+
+func (c *ChatController) Unpin(ctx contractshttp.Context) contractshttp.Response {
+	inst := middleware.GetInstance(ctx)
+	chatJID, err := requireJID(ctx, "chatId")
+	if err != nil {
+		return response.Error(ctx, err)
+	}
+	if err := c.svc.Pin(inst.ID, chatJID, false); err != nil {
+		return response.Error(ctx, err)
+	}
+	return ctx.Response().Success().Json(response.NewSuccess(nil, "Chat unpinned successfully"))
+}
+
+func (c *ChatController) Archive(ctx contractshttp.Context) contractshttp.Response {
+	inst := middleware.GetInstance(ctx)
+	chatJID, err := requireJID(ctx, "chatId")
+	if err != nil {
+		return response.Error(ctx, err)
+	}
+	if err := c.svc.Archive(inst.ID, chatJID, true); err != nil {
+		return response.Error(ctx, err)
+	}
+	return ctx.Response().Success().Json(response.NewSuccess(nil, "Chat archived successfully"))
+}
+
+func (c *ChatController) Unarchive(ctx contractshttp.Context) contractshttp.Response {
+	inst := middleware.GetInstance(ctx)
+	chatJID, err := requireJID(ctx, "chatId")
+	if err != nil {
+		return response.Error(ctx, err)
+	}
+	if err := c.svc.Archive(inst.ID, chatJID, false); err != nil {
+		return response.Error(ctx, err)
+	}
+	return ctx.Response().Success().Json(response.NewSuccess(nil, "Chat unarchived successfully"))
+}
+
+func (c *ChatController) Mute(ctx contractshttp.Context) contractshttp.Response {
+	inst := middleware.GetInstance(ctx)
+	chatJID, err := requireJID(ctx, "chatId")
+	if err != nil {
+		return response.Error(ctx, err)
+	}
+	// Parse duration from request, default to 8 hours
+	duration := 8 * time.Hour
+	if d := ctx.Request().InputInt64("duration", 0); d > 0 {
+		duration = time.Duration(d) * time.Second
+	}
+	if err := c.svc.Mute(inst.ID, chatJID, true, duration); err != nil {
+		return response.Error(ctx, err)
+	}
+	return ctx.Response().Success().Json(response.NewSuccess(nil, "Chat muted successfully"))
+}
+
+func (c *ChatController) Unmute(ctx contractshttp.Context) contractshttp.Response {
+	inst := middleware.GetInstance(ctx)
+	chatJID, err := requireJID(ctx, "chatId")
+	if err != nil {
+		return response.Error(ctx, err)
+	}
+	if err := c.svc.Mute(inst.ID, chatJID, false, 0); err != nil {
+		return response.Error(ctx, err)
+	}
+	return ctx.Response().Success().Json(response.NewSuccess(nil, "Chat unmuted successfully"))
+}
+
+// Ensure types import is used (for requireJID return type).
+var _ types.JID
