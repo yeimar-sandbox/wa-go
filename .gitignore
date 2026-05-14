@@ -1,0 +1,32 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Storage (logs, cache, sessions)
+storage/
+
+# Temp / build artifacts
+tmp/
+wa_go_app
+wa_go_app.exe
+*.exe
+*.out
+
+# Go
+vendor/
+
+# WhatsApp session data
+*.db
+*.db-wal
+*.db-shm
