@@ -1,0 +1,38 @@
+# golangci-lint configuration.
+# Schema: golangci-lint v1.x (https://golangci-lint.run/usage/configuration/)
+#
+# Kept intentionally permissive so CI passes on day one. Tighten over time by
+# moving linters from `disable` to `enable` and addressing what they report.
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - misspell
+
+issues:
+  exclude-dirs:
+    - whatsmeow-lib
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - staticcheck
+    # Goravel bind/JSON marshal errors are intentionally ignored in controllers.
+    - path: app/http/controllers/
+      linters:
+        - errcheck
+      text: "Error return value of .*json\\.Unmarshal.* is not checked"
+
+linters-settings:
+  errcheck:
+    check-type-assertions: false
+    check-blank: false

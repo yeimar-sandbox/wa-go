@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -32,8 +33,9 @@ type WebhookTarget struct {
 
 type EventDispatcher struct {
 	httpCl    *http.Client
-	targets   map[string][]WebhookTarget      // instanceID -> webhooks
-	wsClients map[string][]chan WebhookEvent  // instanceID -> websocket channels
+	mu        sync.RWMutex
+	targets   map[string][]WebhookTarget     // instanceID -> webhooks
+	wsClients map[string][]chan WebhookEvent // instanceID -> websocket channels
 }
 
 func NewEventDispatcher() *EventDispatcher {
@@ -45,10 +47,14 @@ func NewEventDispatcher() *EventDispatcher {
 }
 
 func (d *EventDispatcher) Register(instanceID string, target WebhookTarget) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	d.targets[instanceID] = append(d.targets[instanceID], target)
 }
 
 func (d *EventDispatcher) Unregister(instanceID, url string) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	targets := d.targets[instanceID]
 	filtered := make([]WebhookTarget, 0, len(targets))
 	for _, t := range targets {
@@ -60,16 +66,22 @@ func (d *EventDispatcher) Unregister(instanceID, url string) {
 }
 
 func (d *EventDispatcher) SetTargets(instanceID string, targets []WebhookTarget) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	d.targets[instanceID] = targets
 }
 
 func (d *EventDispatcher) SubscribeWs(instanceID string) <-chan WebhookEvent {
 	ch := make(chan WebhookEvent, 100)
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	d.wsClients[instanceID] = append(d.wsClients[instanceID], ch)
 	return ch
 }
 
 func (d *EventDispatcher) UnsubscribeWs(instanceID string, ch <-chan WebhookEvent) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	clients := d.wsClients[instanceID]
 	filtered := make([]chan WebhookEvent, 0, len(clients))
 	for _, c := range clients {
@@ -91,24 +103,22 @@ func (d *EventDispatcher) Dispatch(instanceID, eventType string, data any) {
 		Data:       data,
 	}
 
-	// Dispatch to Websocket Clients
-	if clients, ok := d.wsClients[instanceID]; ok {
-		for _, ch := range clients {
-			select {
-			case ch <- evt:
-			default:
-				// channel full, drop event
-			}
+	// Hold the read lock through the whole send loop so a concurrent
+	// UnsubscribeWs cannot close(c) while we are sending into it.
+	// WS sends are non-blocking (select/default) and webhook sends are
+	// goroutine'd, so the critical section stays short.
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+
+	for _, ch := range d.wsClients[instanceID] {
+		select {
+		case ch <- evt:
+		default:
+			// channel full, drop event
 		}
 	}
 
-	// Dispatch to Webhooks
-	targets, ok := d.targets[instanceID]
-	if !ok {
-		return
-	}
-
-	for _, target := range targets {
+	for _, target := range d.targets[instanceID] {
 		if !d.matchesEvent(target.Events, eventType) {
 			continue
 		}

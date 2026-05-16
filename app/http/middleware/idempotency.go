@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"encoding/json"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -13,6 +15,17 @@ type idempotencyEntry struct {
 	body   []byte
 	at     time.Time
 }
+
+// idempotencyMaxEntries caps the in-memory store to bound memory usage.
+// Override with IDEMPOTENCY_MAX_ENTRIES env var.
+var idempotencyMaxEntries = func() int {
+	if v := os.Getenv("IDEMPOTENCY_MAX_ENTRIES"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 {
+			return n
+		}
+	}
+	return 10000
+}()
 
 var (
 	idempotencyStore = make(map[string]*idempotencyEntry)
@@ -53,7 +66,37 @@ func StoreIdempotencyResult(key string, status int, body any) {
 	data, _ := json.Marshal(body)
 	idempotencyMu.Lock()
 	idempotencyStore[key] = &idempotencyEntry{status: status, body: data, at: time.Now()}
+	if len(idempotencyStore) > idempotencyMaxEntries {
+		evictOldestLocked(len(idempotencyStore) - idempotencyMaxEntries)
+	}
 	idempotencyMu.Unlock()
+}
+
+// evictOldestLocked removes the n oldest entries. Caller must hold idempotencyMu.
+func evictOldestLocked(n int) {
+	if n <= 0 {
+		return
+	}
+	type kv struct {
+		key string
+		at  time.Time
+	}
+	all := make([]kv, 0, len(idempotencyStore))
+	for k, v := range idempotencyStore {
+		all = append(all, kv{k, v.at})
+	}
+	// Partial sort would be faster, but n is typically small (drift above cap).
+	// A full sort keeps the code simple and correctness obvious.
+	for i := 0; i < n && i < len(all); i++ {
+		oldestIdx := i
+		for j := i + 1; j < len(all); j++ {
+			if all[j].at.Before(all[oldestIdx].at) {
+				oldestIdx = j
+			}
+		}
+		all[i], all[oldestIdx] = all[oldestIdx], all[i]
+		delete(idempotencyStore, all[i].key)
+	}
 }
 
 func init() {
