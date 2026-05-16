@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src=".github/dark-banner.png" alt="WA-Go" width="100%">
+<img src=".github/dark-banner.png" alt="WA-Go" width="800">
 
 <br/>
 <br/>
