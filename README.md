@@ -15,7 +15,7 @@
 
 </div>
 
-wa-go wraps [whatsmeow](https://github.com/tulir/whatsmeow) in a [Goravel](https://www.goravel.dev) service so the rest of your stack only ever sees idiomatic HTTP. It is designed as an edge component: it owns the WhatsApp protocol and nothing else. Orchestration, AI agents, media pipelines and admin UI live in their own services and integrate with wa-go over webhooks or WebSocket — they never touch the wire.
+wa-go wraps [whatsmeow](https://github.com/tulir/whatsmeow) in a [Goravel](https://www.goravel.dev) service so the rest of your stack only ever sees idiomatic HTTP. It is designed as an **edge component meant to be combined with a larger platform**: wa-go owns the WhatsApp protocol and nothing else. Orchestration, AI agents, media pipelines and admin UI live in their own services and integrate with wa-go over webhooks or WebSocket — they never touch the wire.
 
 ---
 
@@ -57,10 +57,14 @@ wa-go is the layer that owns all of that. It wraps whatsmeow in a multi-instance
 
 ## Built for
 
+wa-go is the building block you put underneath a larger platform — not the platform itself. Typical uses:
+
 - **AI conversational agents.** Receive voice notes, push them through your STT → LLM → TTS pipeline, send the response back as audio.
 - **Customer service platforms.** Many numbers, many agents, idempotent sends, signed webhooks.
 - **Internal CRM and notification systems.** Trigger messages from your existing services without re-implementing the WhatsApp protocol.
 - **Automation and scheduling.** Hook wa-go into Make, n8n, Temporal, or your own scheduler over webhooks or WebSocket.
+
+It is designed to be combined: drop it in as the WhatsApp tier and build whatever business logic, UI or orchestration you need on top.
 
 ---
 
